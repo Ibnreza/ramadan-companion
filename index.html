@@ -3,274 +3,622 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Companion - Kachua, Chandpur</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Ramadan Companion – Kachua</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        
-        .glass {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(16, 185, 129, 0.25);
+        :root {
+            --green:     #1a6b4a;
+            --green-mid: #2d8f64;
+            --green-lt:  #4db885;
+            --gold:      #c9943a;
+            --gold-lt:   #f0c97a;
+            --cream:     #faf7f2;
+            --ink:       #1a1a2e;
+            --muted:     #6b7280;
+            --card:      #ffffff;
+            --border:    #e8e2d9;
         }
-        
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: var(--cream);
+            color: var(--ink);
+            min-height: 100vh;
+            padding-bottom: 80px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ── decorative background ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(26,107,74,.12) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 90% 80%,  rgba(201,148,58,.07) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #app {
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Header ── */
+        header {
+            padding: 20px 24px 16px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 16px rgba(0,0,0,.06);
+        }
+
+        .logo-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, var(--green), var(--green-lt));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(26,107,74,.3);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--green);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .header-sub {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .header-sub i { color: var(--gold); }
+
+        #live-clock {
+            text-align: right;
+        }
+
+        #time-display {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--ink);
+            line-height: 1;
+        }
+
+        #date-display {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            font-weight: 700;
+            margin-top: 3px;
+        }
+
+        /* ── Main ── */
+        main { flex-grow: 1; padding: 20px 16px; }
+
+        /* ── Hero Card ── */
+        .hero-card {
+            background: linear-gradient(145deg, var(--green) 0%, #0f4a32 100%);
+            border-radius: 28px;
+            padding: 28px 24px 24px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 12px 40px rgba(26,107,74,.35);
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-card::after {
+            content: '\f038d';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            bottom: -16px; right: -8px;
+            font-size: 110px;
+            color: rgba(255,255,255,.06);
+            line-height: 1;
+        }
+
+        .hero-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.65);
+            margin-bottom: 6px;
+        }
+
+        #countdown-display {
+            font-size: 46px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #next-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,.7);
+            margin-bottom: 16px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .gold-dot {
+            width: 6px; height: 6px;
+            background: var(--gold-lt);
+            border-radius: 50%;
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50%      { opacity: .5; transform: scale(.7); }
+        }
+
+        /* ── Time Cards ── */
+        .time-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .time-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(0,0,0,.04);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .time-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.08); }
+
+        .time-icon {
+            width: 42px; height: 42px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 16px;
+        }
+
+        .time-icon.sahari { background: #e8f5ee; color: var(--green); }
+        .time-icon.iftar  { background: #fef3e2; color: var(--gold); }
+
+        .time-label {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .time-value {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--ink);
+        }
+
+        /* ── Duas Card ── */
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(0,0,0,.04);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            padding: 14px 18px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--ink);
+        }
+
+        .card-header i { color: var(--green); }
+
+        .dua-block { padding: 16px 18px; }
+        .dua-block + .dua-block { border-top: 1px dashed var(--border); }
+
+        .dua-tag {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .dua-tag.green { background: #e8f5ee; color: var(--green); }
+        .dua-tag.gold  { background: #fef3e2; color: var(--gold); }
+
+        .arabic-text {
+            font-family: 'Amiri', serif;
+            font-size: 20px;
+            line-height: 1.9;
+            text-align: right;
+            direction: rtl;
+            color: var(--ink);
+        }
+
+        /* ── Calendar ── */
+        .cal-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .cal-table thead tr {
+            background: #f4f7f5;
+        }
+
+        .cal-table th {
+            padding: 10px 12px;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: var(--muted);
+        }
+
+        .cal-table tbody tr {
+            border-top: 1px solid var(--border);
+            transition: background .15s;
+        }
+
+        .cal-table tbody tr:hover { background: #f9faf8; }
+
+        .cal-table tbody tr.today-row {
+            background: linear-gradient(90deg, rgba(26,107,74,.06) 0%, transparent 100%);
+        }
+
+        .cal-table td { padding: 10px 12px; }
+
+        .day-num {
+            font-weight: 800;
+            color: var(--green);
+            font-size: 13px;
+        }
+
+        .cal-date { font-weight: 700; color: var(--ink); font-size: 13px; }
+        .cal-weekday { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-top: 1px; }
+        .cal-sahari { color: var(--green); font-weight: 700; font-size: 12px; }
+        .cal-iftar  { color: var(--gold);  font-weight: 700; font-size: 12px; }
+
+        .today-badge {
+            display: inline-block;
+            font-size: 8px;
+            font-weight: 800;
+            background: var(--green);
+            color: #fff;
+            border-radius: 4px;
+            padding: 1px 5px;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+
+        /* ── Tips ── */
+        .tips-card {
+            background: var(--card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(0,0,0,.04);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .tips-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tips-header-icon {
+            width: 36px; height: 36px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+        }
+
+        .tips-header-icon.green { background: #e8f5ee; color: var(--green); }
+        .tips-header-icon.gold  { background: #fef3e2; color: var(--gold); }
+
+        .tips-header-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .tips-header-sub {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .tips-list { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+        .tip-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 10px 12px;
+            background: #fafafa;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .tip-check {
+            width: 20px; height: 20px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .tip-check.green { background: #e8f5ee; color: var(--green); }
+        .tip-check.gold  { background: #fef3e2; color: var(--gold); }
+
+        /* ── Bottom Nav ── */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: rgba(255,255,255,.97);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border);
+            padding: 10px 24px 14px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 50;
+            box-shadow: 0 -4px 24px rgba(0,0,0,.07);
+        }
+
         .nav-btn {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 16px;
+            border-radius: 14px;
+            transition: all .2s;
+            color: var(--muted);
         }
+
+        .nav-btn i { font-size: 17px; transition: transform .2s; }
+        .nav-btn span { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; font-family: 'Raleway', sans-serif; }
+
         .nav-btn.active {
-            color: #10b981;
-            transform: scale(1.12);
+            color: var(--green);
+            background: rgba(26,107,74,.08);
         }
-        
-        .dua-arabic {
-            font-size: 1.75rem;
-            line-height: 1.4;
-            font-family: serif;
+
+        .nav-btn.active i { transform: scale(1.15); }
+
+        .hidden { display: none !important; }
+
+        /* ── Animations ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .view-enter { animation: fadeUp .3s ease forwards; }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--green-lt); border-radius: 10px; }
+
+        /* ── Ornament separator ── */
+        .ornament {
+            text-align: center;
+            color: var(--gold);
+            font-size: 16px;
+            margin: 4px 0 16px;
+            letter-spacing: 6px;
+            opacity: .5;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-20">
+<body>
 
-    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="p-6 bg-slate-900 border-b border-emerald-900/50 sticky top-0 z-50 flex justify-between items-center">
+<div id="app">
+    <!-- ── Header ── -->
+    <header>
+        <div class="logo-row">
+            <div class="logo-icon"><i class="fas fa-moon"></i></div>
             <div>
-                <h1 class="text-2xl font-extrabold text-emerald-400 flex items-center gap-2">
-                    <i class="fas fa-moon text-yellow-400"></i> Ramadan 2026
-                </h1>
-                <p class="text-xs text-slate-400 font-medium tracking-wide">
-                    <i class="fas fa-location-dot text-emerald-500 mr-1"></i> KACHUA, CHANDPUR
-                </p>
-            </div>
-            <div id="live-clock" class="text-right">
-                <p class="text-2xl font-bold leading-none text-emerald-300" id="time-display">--:--</p>
-                <p class="text-[10px] uppercase text-slate-500 font-bold" id="date-display">---</p>
-            </div>
-        </header>
-
-        <main class="flex-grow p-4">
-            <!-- View: Dashboard -->
-            <div id="view-dashboard" class="space-y-6">
-                <!-- Status Card -->
-                <div class="glass p-6 rounded-3xl shadow-2xl relative overflow-hidden">
-                    <div class="relative z-10">
-                        <p class="text-emerald-400 text-sm font-medium mb-1" id="next-label">Next Milestone</p>
-                        <h2 class="text-5xl font-black mb-3 tracking-tighter" id="countdown-display">Calculating...</h2>
-                        <div class="flex items-center gap-3">
-                            <div class="bg-emerald-500/20 px-4 py-1 rounded-full text-sm">
-                                <i class="fas fa-calendar-check mr-2"></i> Day <span id="current-ramadan-day" class="font-bold">1</span>
-                            </div>
-                        </div>
-                    </div>
-                    <i class="fas fa-mosque absolute -bottom-6 -right-6 text-emerald-500/10 text-[140px]"></i>
+                <div class="header-title">Ramadan 1447</div>
+                <div class="header-sub">
+                    <i class="fas fa-location-dot"></i> Kachua, Chandpur
                 </div>
+            </div>
+        </div>
+        <div id="live-clock">
+            <div id="time-display">--:--</div>
+            <div id="date-display">---</div>
+        </div>
+    </header>
 
-                <!-- Daily Times -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="glass p-5 rounded-3xl text-center">
-                        <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                            <i class="fas fa-sun text-2xl"></i>
-                        </div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Sahari Ends</p>
-                        <p class="text-3xl font-bold text-emerald-300 mt-1" id="today-sahari">--:--</p>
-                    </div>
-                    <div class="glass p-5 rounded-3xl text-center">
-                        <div class="w-12 h-12 bg-orange-500/10 text-orange-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                            <i class="fas fa-moon text-2xl"></i>
-                        </div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Iftar Starts</p>
-                        <p class="text-3xl font-bold text-orange-300 mt-1" id="today-iftar">--:--</p>
-                    </div>
-                </div>
+    <main>
+        <!-- ══ View: Dashboard ══ -->
+        <div id="view-dashboard" class="view-enter">
 
-                <!-- Duas -->
-                <div class="glass p-6 rounded-3xl">
-                    <h3 class="font-bold text-emerald-400 mb-5 flex items-center gap-2">
-                        <i class="fas fa-book-open"></i> Daily Duas
-                    </h3>
-                    <div class="space-y-8">
-                        <div>
-                            <p class="text-xs font-bold text-emerald-400 mb-2">Sahari Dua</p>
-                            <p class="dua-arabic text-right text-emerald-100 leading-relaxed" dir="rtl">نَوَيْتُ اَنْ اَصُوْمَ غَدًا مِّنْ شَهْرِ رَمْضَانَ الْمُبَارَكِ فَرْضًا لَكَ يَا اللهُ</p>
-                            <p class="text-xs text-slate-400 mt-3 text-right">“I intend to fast tomorrow for the month of Ramadan, obligatory for You, O Allah.”</p>
-                        </div>
-                        <div class="border-t border-emerald-900 pt-6">
-                            <p class="text-xs font-bold text-orange-400 mb-2">Iftar Dua</p>
-                            <p class="dua-arabic text-right text-emerald-100 leading-relaxed" dir="rtl">اَللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ اَفْطَرْتُ</p>
-                            <p class="text-xs text-slate-400 mt-3 text-right">“O Allah, for You I have fasted and with Your provision I break my fast.”</p>
-                        </div>
-                    </div>
+            <!-- Hero Countdown -->
+            <div class="hero-card">
+                <div class="hero-label">Ramadan Day <span id="current-ramadan-day">—</span></div>
+                <div id="countdown-display">00:00:00</div>
+                <div id="next-label" style="font-size:12px;color:rgba(255,255,255,.65);margin:6px 0 18px;font-weight:600;">Calculating…</div>
+                <div class="hero-badge">
+                    <span class="gold-dot"></span>
+                    <span>Live Countdown</span>
                 </div>
             </div>
 
-            <!-- View: Calendar -->
-            <div id="view-calendar" class="hidden space-y-4">
-                <div class="glass rounded-3xl overflow-hidden">
-                    <table class="w-full text-sm">
-                        <thead class="bg-slate-900">
+            <!-- Sahari / Iftar Times -->
+            <div class="time-grid">
+                <div class="time-card">
+                    <div class="time-icon sahari"><i class="fas fa-sun"></i></div>
+                    <div class="time-label">Sahari Ends</div>
+                    <div class="time-value" id="today-sahari">--:--</div>
+                </div>
+                <div class="time-card">
+                    <div class="time-icon iftar"><i class="fas fa-moon"></i></div>
+                    <div class="time-label">Iftar Begins</div>
+                    <div class="time-value" id="today-iftar">--:--</div>
+                </div>
+            </div>
+
+            <!-- Daily Duas -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-book-open"></i> Daily Prayers
+                </div>
+                <div class="dua-block">
+                    <span class="dua-tag green">Dua for Fasting (Niyyah)</span>
+                    <div class="arabic-text">نَوَيْتُ اَنْ اَصُوْمَ غَدًا مِّنْ شَهْرِ رَمْضَانَ الْمُبَارَكِ فَرْضًا لَكَ يَا اللهُ</div>
+                </div>
+                <div class="dua-block">
+                    <span class="dua-tag gold">Dua for Breaking Fast (Iftar)</span>
+                    <div class="arabic-text">اَللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ اَفْطَرْتُ</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ══ View: Calendar ══ -->
+        <div id="view-calendar" class="hidden">
+            <div class="card" style="margin-bottom:0;">
+                <div class="card-header">
+                    <i class="fas fa-calendar-days"></i> Full Schedule – Kachua 2026
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="cal-table">
+                        <thead>
                             <tr>
-                                <th class="p-4 text-center w-12 text-emerald-400">Ram</th>
-                                <th class="p-4 text-left text-slate-400">Date</th>
-                                <th class="p-4 text-center text-emerald-400">Sahari</th>
-                                <th class="p-4 text-center text-orange-400">Iftar</th>
+                                <th style="text-align:center;">Day</th>
+                                <th>Date</th>
+                                <th style="text-align:center;">Sahari</th>
+                                <th style="text-align:center;">Iftar</th>
                             </tr>
                         </thead>
-                        <tbody id="calendar-body" class="divide-y divide-slate-800 text-slate-300"></tbody>
+                        <tbody id="calendar-body"></tbody>
                     </table>
                 </div>
             </div>
+        </div>
 
-            <!-- View: Tips -->
-            <div id="view-tips" class="hidden space-y-4">
-                <div class="glass p-6 rounded-3xl">
-                    <h3 class="font-bold text-emerald-400 mb-4 flex items-center gap-2"><i class="fas fa-sun"></i> Sahari Tips</h3>
-                    <ul class="space-y-4 text-slate-300 text-sm">
-                        <li class="flex gap-3"><i class="fas fa-check text-emerald-400 mt-1"></i> Eat complex carbs (oats, brown rice) for long energy.</li>
-                        <li class="flex gap-3"><i class="fas fa-check text-emerald-400 mt-1"></i> Drink 2–2.5 litres of water slowly.</li>
-                        <li class="flex gap-3"><i class="fas fa-check text-emerald-400 mt-1"></i> Include dates & yogurt.</li>
-                    </ul>
+        <!-- ══ View: Tips ══ -->
+        <div id="view-tips" class="hidden">
+            <div class="ornament">✦ ✦ ✦</div>
+
+            <div class="tips-card">
+                <div class="tips-header">
+                    <div class="tips-header-icon green"><i class="fas fa-heart-pulse"></i></div>
+                    <div>
+                        <div class="tips-header-title">Sahari Tips</div>
+                        <div class="tips-header-sub">Fuel your fast wisely</div>
+                    </div>
                 </div>
-                <div class="glass p-6 rounded-3xl">
-                    <h3 class="font-bold text-orange-400 mb-4 flex items-center gap-2"><i class="fas fa-moon"></i> Iftar Tips</h3>
-                    <ul class="space-y-4 text-slate-300 text-sm">
-                        <li class="flex gap-3"><i class="fas fa-check text-orange-400 mt-1"></i> Start with 3 dates + water (Sunnah).</li>
-                        <li class="flex gap-3"><i class="fas fa-check text-orange-400 mt-1"></i> Wait 10–15 minutes before full meal.</li>
-                        <li class="flex gap-3"><i class="fas fa-check text-orange-400 mt-1"></i> Add fruits & avoid heavy fried food.</li>
-                    </ul>
+                <div class="tips-list">
+                    <div class="tip-item">
+                        <div class="tip-check green"><i class="fas fa-check"></i></div>
+                        Eat slowly-digesting foods like oats, eggs, or brown rice to stay full longer.
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-check green"><i class="fas fa-check"></i></div>
+                        Drink at least 1 litre of water slowly — avoid gulping all at once.
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-check green"><i class="fas fa-check"></i></div>
+                        Limit caffeine (tea/coffee) — it increases fluid loss and causes dehydration.
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-check green"><i class="fas fa-check"></i></div>
+                        Include bananas or yogurt for sustained energy and gut health.
+                    </div>
                 </div>
             </div>
-        </main>
 
-        <!-- Bottom Navigation -->
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-slate-900 border-t border-emerald-900/50 px-6 py-3 flex justify-between items-center shadow-2xl z-50">
-            <button onclick="switchView('dashboard')" class="nav-btn active flex flex-col items-center gap-1 text-emerald-400" id="btn-dashboard">
-                <i class="fas fa-home text-xl"></i>
-                <span class="text-[10px] font-bold">Home</span>
-            </button>
-            <button onclick="switchView('calendar')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="btn-calendar">
-                <i class="fas fa-calendar-days text-xl"></i>
-                <span class="text-[10px] font-bold">Calendar</span>
-            </button>
-            <button onclick="switchView('tips')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="btn-tips">
-                <i class="fas fa-lightbulb text-xl"></i>
-                <span class="text-[10px] font-bold">Essentials</span>
-            </button>
-        </nav>
-    </div>
-
-    <script>
-        // --- Data ---
-        const RAMADAN_START_DATE = new Date(2026, 1, 19); // Feb 19, 2026
-
-        const schedule = Array.from({ length: 30 }, (_, i) => {
-            const date = new Date(RAMADAN_START_DATE);
-            date.setDate(RAMADAN_START_DATE.getDate() + i);
-            
-            const dayOffset = i;
-            const sMin = Math.max(4, 11 - Math.floor(dayOffset / 1.1));
-            const iMin = 55 + Math.floor(dayOffset / 1.3);
-
-            const sahariDate = new Date(date);
-            sahariDate.setHours(5, sMin, 0);
-
-            const iftarDate = new Date(date);
-            iftarDate.setHours(17, iMin, 0);
-
-            return {
-                ramadan: i + 1,
-                date: date,
-                sahari: sahariDate,
-                iftar: iftarDate,
-                dateString: date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-                dayName: date.toLocaleDateString('en-GB', { weekday: 'short' })
-            };
-        });
-
-        // --- UI Functions ---
-        function switchView(viewName) {
-            ['dashboard', 'calendar', 'tips'].forEach(v => {
-                document.getElementById(`view-${v}`).classList.add('hidden');
-                document.getElementById(`btn-${v}`).classList.remove('active', 'text-emerald-400');
-                document.getElementById(`btn-${v}`).classList.add('text-slate-400');
-            });
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            document.getElementById(`btn-${viewName}`).classList.add('active', 'text-emerald-400');
-            window.scrollTo(0, 0);
-        }
-
-        function formatTime(date) {
-            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-        }
-
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('time-display').innerText = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-            document.getElementById('date-display').innerText = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            updateCountdown(now);
-        }
-
-        function updateCountdown(now) {
-            let todayData = schedule.find(d => 
-                d.date.getFullYear() === now.getFullYear() &&
-                d.date.getMonth() === now.getMonth() &&
-                d.date.getDate() === now.getDate()
-            ) || schedule[0];
-
-            document.getElementById('current-ramadan-day').innerText = todayData.ramadan;
-            document.getElementById('today-sahari').innerText = formatTime(todayData.sahari);
-            document.getElementById('today-iftar').innerText = formatTime(todayData.iftar);
-
-            const sTime = todayData.sahari.getTime();
-            const iTime = todayData.iftar.getTime();
-            const currentTime = now.getTime();
-
-            let target, label;
-
-            if (currentTime < sTime) {
-                target = sTime;
-                label = "Sahari Ends In";
-            } else if (currentTime < iTime) {
-                target = iTime;
-                label = "Iftar In";
-            } else {
-                // Next day's Sahari
-                const nextIndex = Math.min(todayData.ramadan, 29);
-                target = schedule[nextIndex].sahari.getTime();
-                label = "Next Sahari";
-            }
-
-            const diff = Math.max(0, target - currentTime);
-            const h = Math.floor(diff / (1000 * 60 * 60));
-            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-            document.getElementById('next-label').innerText = label;
-            document.getElementById('countdown-display').innerText = 
-                `\( {h.toString().padStart(2, '0')}: \){m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
-
-        function renderCalendar() {
-            const tbody = document.getElementById('calendar-body');
-            tbody.innerHTML = schedule.map(day => `
-                <tr class="hover:bg-slate-800/50 transition-colors">
-                    <td class="p-4 text-center font-bold text-emerald-400">${day.ramadan}</td>
-                    <td class="p-4">
-                        <div class="font-medium">${day.dateString}</div>
-                        <div class="text-xs text-slate-500">${day.dayName}</div>
-                    </td>
-                    <td class="p-4 text-center font-mono text-emerald-400">${formatTime(day.sahari)}</td>
-                    <td class="p-4 text-center font-mono text-orange-400">${formatTime(day.iftar)}</td>
-                </tr>
-            `).join('');
-        }
-
-        // Init
-        renderCalendar();
-        setInterval(updateClock, 1000);
-        updateClock();
-        switchView('dashboard'); // start on dashboard
-    </script>
-</body>
-</html>
+            <div class="tips-card">
+     
