@@ -149,15 +149,14 @@
             border-radius: 50%;
         }
 
-        .hero-card::after {
-            content: '\f038d';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
+        .hero-card-deco {
             position: absolute;
-            bottom: -16px; right: -8px;
-            font-size: 110px;
-            color: rgba(255,255,255,.06);
+            bottom: -10px; right: 10px;
+            font-size: 100px;
+            color: rgba(255,255,255,.07);
             line-height: 1;
+            pointer-events: none;
+            user-select: none;
         }
 
         .hero-label {
@@ -526,6 +525,7 @@
 
             <!-- Hero Countdown -->
             <div class="hero-card">
+                <i class="fas fa-mosque hero-card-deco"></i>
                 <div class="hero-label">Ramadan Day <span id="current-ramadan-day">—</span></div>
                 <div id="countdown-display">00:00:00</div>
                 <div id="next-label" style="font-size:12px;color:rgba(255,255,255,.65);margin:6px 0 18px;font-weight:600;">Calculating…</div>
@@ -620,5 +620,4 @@
                 </div>
             </div>
 
-            <div class="tips-card">
-     
+            <div class="ti
