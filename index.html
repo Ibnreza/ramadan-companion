@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,124 +7,270 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&family=Inter:wght@400;600&display=swap');
-        body { font-family: 'Noto Sans Bengali', system-ui, sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        
+        .nav-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-btn.active {
+            color: #10b981;
+            transform: scale(1.12);
+        }
+        
+        .dua-arabic {
+            font-size: 1.75rem;
+            line-height: 1.4;
+            font-family: serif;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-b from-slate-950 to-emerald-950 text-slate-100 min-h-screen">
-    <div class="max-w-lg mx-auto p-5">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-20">
+
+    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="text-center py-10">
-            <div class="mx-auto w-24 h-24 bg-yellow-400/10 rounded-3xl flex items-center justify-center mb-6">
-                <i class="fa-solid fa-moon text-7xl text-yellow-300"></i>
+        <header class="p-6 bg-slate-900 border-b border-emerald-900/50 sticky top-0 z-50 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-extrabold text-emerald-400 flex items-center gap-2">
+                    <i class="fas fa-moon text-yellow-400"></i> Ramadan 2026
+                </h1>
+                <p class="text-xs text-slate-400 font-medium tracking-wide">
+                    <i class="fas fa-location-dot text-emerald-500 mr-1"></i> KACHUA, CHANDPUR
+                </p>
             </div>
-            <h1 class="text-5xl font-bold tracking-tight text-emerald-200">রমজান ২০২৬</h1>
-            <p class="text-2xl text-slate-400 mt-1">Kachua, Chandpur</p>
+            <div id="live-clock" class="text-right">
+                <p class="text-2xl font-bold leading-none text-emerald-300" id="time-display">--:--</p>
+                <p class="text-[10px] uppercase text-slate-500 font-bold" id="date-display">---</p>
+            </div>
         </header>
 
-        <!-- Live Status -->
-        <div class="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 mb-8 border border-emerald-700/50">
-            <div class="text-center">
-                <p class="text-emerald-400 text-sm uppercase tracking-widest mb-1">এখন সময়</p>
-                <div id="live-clock" class="text-6xl font-mono font-bold text-white">00:00:00</div>
-                <p class="text-slate-400 mt-4">রমজান দিন: <span class="text-emerald-300 font-semibold">--</span></p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-6 mt-8">
-                <div>
-                    <div class="flex items-center gap-2 text-amber-400 mb-2">
-                        <i class="fa-solid fa-sun"></i>
-                        <span class="font-medium">সেহরি শেষ</span>
+        <main class="flex-grow p-4">
+            <!-- View: Dashboard -->
+            <div id="view-dashboard" class="space-y-6">
+                <!-- Status Card -->
+                <div class="glass p-6 rounded-3xl shadow-2xl relative overflow-hidden">
+                    <div class="relative z-10">
+                        <p class="text-emerald-400 text-sm font-medium mb-1" id="next-label">Next Milestone</p>
+                        <h2 class="text-5xl font-black mb-3 tracking-tighter" id="countdown-display">Calculating...</h2>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-emerald-500/20 px-4 py-1 rounded-full text-sm">
+                                <i class="fas fa-calendar-check mr-2"></i> Day <span id="current-ramadan-day" class="font-bold">1</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-4xl font-mono font-bold text-amber-300">--:--</div>
+                    <i class="fas fa-mosque absolute -bottom-6 -right-6 text-emerald-500/10 text-[140px]"></i>
                 </div>
-                <div>
-                    <div class="flex items-center gap-2 text-emerald-400 mb-2">
-                        <i class="fa-solid fa-moon"></i>
-                        <span class="font-medium">ইফতার শুরু</span>
+
+                <!-- Daily Times -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass p-5 rounded-3xl text-center">
+                        <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-sun text-2xl"></i>
+                        </div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Sahari Ends</p>
+                        <p class="text-3xl font-bold text-emerald-300 mt-1" id="today-sahari">--:--</p>
                     </div>
-                    <div class="text-4xl font-mono font-bold text-emerald-300">--:--</div>
+                    <div class="glass p-5 rounded-3xl text-center">
+                        <div class="w-12 h-12 bg-orange-500/10 text-orange-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-moon text-2xl"></i>
+                        </div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Iftar Starts</p>
+                        <p class="text-3xl font-bold text-orange-300 mt-1" id="today-iftar">--:--</p>
+                    </div>
+                </div>
+
+                <!-- Duas -->
+                <div class="glass p-6 rounded-3xl">
+                    <h3 class="font-bold text-emerald-400 mb-5 flex items-center gap-2">
+                        <i class="fas fa-book-open"></i> Daily Duas
+                    </h3>
+                    <div class="space-y-8">
+                        <div>
+                            <p class="text-xs font-bold text-emerald-400 mb-2">Sahari Dua</p>
+                            <p class="dua-arabic text-right text-emerald-100 leading-relaxed" dir="rtl">نَوَيْتُ اَنْ اَصُوْمَ غَدًا مِّنْ شَهْرِ رَمْضَانَ الْمُبَارَكِ فَرْضًا لَكَ يَا اللهُ</p>
+                            <p class="text-xs text-slate-400 mt-3 text-right">“I intend to fast tomorrow for the month of Ramadan, obligatory for You, O Allah.”</p>
+                        </div>
+                        <div class="border-t border-emerald-900 pt-6">
+                            <p class="text-xs font-bold text-orange-400 mb-2">Iftar Dua</p>
+                            <p class="dua-arabic text-right text-emerald-100 leading-relaxed" dir="rtl">اَللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ اَفْطَرْتُ</p>
+                            <p class="text-xs text-slate-400 mt-3 text-right">“O Allah, for You I have fasted and with Your provision I break my fast.”</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Duas -->
-        <div class="space-y-6 mb-8">
-            <div class="bg-slate-900 rounded-3xl p-7 border border-amber-800">
-                <div class="flex items-center gap-3 mb-5">
-                    <i class="fa-solid fa-pray text-2xl text-amber-400"></i>
-                    <h2 class="text-xl font-semibold text-amber-300">সেহরির দোয়া</h2>
+            <!-- View: Calendar -->
+            <div id="view-calendar" class="hidden space-y-4">
+                <div class="glass rounded-3xl overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-900">
+                            <tr>
+                                <th class="p-4 text-center w-12 text-emerald-400">Ram</th>
+                                <th class="p-4 text-left text-slate-400">Date</th>
+                                <th class="p-4 text-center text-emerald-400">Sahari</th>
+                                <th class="p-4 text-center text-orange-400">Iftar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calendar-body" class="divide-y divide-slate-800 text-slate-300"></tbody>
+                    </table>
                 </div>
-                <p class="text-3xl leading-relaxed text-amber-100 font-serif mb-4">نَوَيْتُ اَنْ اَصُوْمَ غَدًا مِّنْ شَهْرِ رَمْضَانَ الْمُبَارَكِ فَرْضًا لَكَ يَا اللهُ</p>
             </div>
 
-            <div class="bg-slate-900 rounded-3xl p-7 border border-emerald-800">
-                <div class="flex items-center gap-3 mb-5">
-                    <i class="fa-solid fa-pray text-2xl text-emerald-400"></i>
-                    <h2 class="text-xl font-semibold text-emerald-300">ইফতারের দোয়া</h2>
+            <!-- View: Tips -->
+            <div id="view-tips" class="hidden space-y-4">
+                <div class="glass p-6 rounded-3xl">
+                    <h3 class="font-bold text-emerald-400 mb-4 flex items-center gap-2"><i class="fas fa-sun"></i> Sahari Tips</h3>
+                    <ul class="space-y-4 text-slate-300 text-sm">
+                        <li class="flex gap-3"><i class="fas fa-check text-emerald-400 mt-1"></i> Eat complex carbs (oats, brown rice) for long energy.</li>
+                        <li class="flex gap-3"><i class="fas fa-check text-emerald-400 mt-1"></i> Drink 2–2.5 litres of water slowly.</li>
+                        <li class="flex gap-3"><i class="fas fa-check text-emerald-400 mt-1"></i> Include dates & yogurt.</li>
+                    </ul>
                 </div>
-                <p class="text-3xl leading-relaxed text-emerald-100 font-serif mb-4">اَللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ اَفْطَرْتُ</p>
+                <div class="glass p-6 rounded-3xl">
+                    <h3 class="font-bold text-orange-400 mb-4 flex items-center gap-2"><i class="fas fa-moon"></i> Iftar Tips</h3>
+                    <ul class="space-y-4 text-slate-300 text-sm">
+                        <li class="flex gap-3"><i class="fas fa-check text-orange-400 mt-1"></i> Start with 3 dates + water (Sunnah).</li>
+                        <li class="flex gap-3"><i class="fas fa-check text-orange-400 mt-1"></i> Wait 10–15 minutes before full meal.</li>
+                        <li class="flex gap-3"><i class="fas fa-check text-orange-400 mt-1"></i> Add fruits & avoid heavy fried food.</li>
+                    </ul>
+                </div>
             </div>
-        </div>
+        </main>
 
-        <!-- Essentials -->
-        <div class="grid grid-cols-1 gap-6 mb-8">
-            <div>
-                <h3 class="text-lg font-semibold flex items-center gap-2 mb-4 text-amber-400">
-                    <i class="fa-solid fa-utensils"></i> সেহরি Essentials
-                </h3>
-                <ul class="space-y-3 text-slate-300">
-                    <li class="flex gap-3"><span class="text-emerald-400 font-bold">১.</span> Drink water slowly, avoid ice cold water.</li>
-                    <li class="flex gap-3"><span class="text-emerald-400 font-bold">২.</span> Eat fiber-rich food like dates, oats, or whole grain.</li>
-                    <li class="flex gap-3"><span class="text-emerald-400 font-bold">৩.</span> A bit of yogurt helps prevent acidity.</li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-lg font-semibold flex items-center gap-2 mb-4 text-emerald-400">
-                    <i class="fa-solid fa-utensils"></i> ইফতার Essentials
-                </h3>
-                <ul class="space-y-3 text-slate-300">
-                    <li class="flex gap-3"><span class="text-emerald-400 font-bold">১.</span> Break fast with 3 dates (Sunnah).</li>
-                    <li class="flex gap-3"><span class="text-emerald-400 font-bold">২.</span> Avoid deep-fried "Piyaju/Beguni" in large amounts.</li>
-                    <li class="flex gap-3"><span class="text-emerald-400 font-bold">৩.</span> Give your stomach 10 mins before heavy meal.</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Table -->
-        <div class="bg-slate-900 rounded-3xl p-6">
-            <h3 class="text-xl font-semibold mb-4 text-center text-slate-200">রমজানের সময়সূচী</h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b border-slate-700">
-                            <th class="py-3 px-4 text-left text-emerald-300">রমজান</th>
-                            <th class="py-3 px-4 text-left text-emerald-300">তারিখ</th>
-                            <th class="py-3 px-4 text-left text-amber-300">সেহরি</th>
-                            <th class="py-3 px-4 text-left text-emerald-300">ইফতার</th>
-                        </tr>
-                    </thead>
-                    <tbody id="schedule-body" class="text-slate-400">
-                        <!-- Add your full schedule rows here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="text-center mt-12 text-xs text-slate-500">
-            Made with ❤️ for a blessed Ramadan • 2026
-        </div>
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-slate-900 border-t border-emerald-900/50 px-6 py-3 flex justify-between items-center shadow-2xl z-50">
+            <button onclick="switchView('dashboard')" class="nav-btn active flex flex-col items-center gap-1 text-emerald-400" id="btn-dashboard">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-[10px] font-bold">Home</span>
+            </button>
+            <button onclick="switchView('calendar')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="btn-calendar">
+                <i class="fas fa-calendar-days text-xl"></i>
+                <span class="text-[10px] font-bold">Calendar</span>
+            </button>
+            <button onclick="switchView('tips')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="btn-tips">
+                <i class="fas fa-lightbulb text-xl"></i>
+                <span class="text-[10px] font-bold">Essentials</span>
+            </button>
+        </nav>
     </div>
 
     <script>
-        // Live clock
+        // --- Data ---
+        const RAMADAN_START_DATE = new Date(2026, 1, 19); // Feb 19, 2026
+
+        const schedule = Array.from({ length: 30 }, (_, i) => {
+            const date = new Date(RAMADAN_START_DATE);
+            date.setDate(RAMADAN_START_DATE.getDate() + i);
+            
+            const dayOffset = i;
+            const sMin = Math.max(4, 11 - Math.floor(dayOffset / 1.1));
+            const iMin = 55 + Math.floor(dayOffset / 1.3);
+
+            const sahariDate = new Date(date);
+            sahariDate.setHours(5, sMin, 0);
+
+            const iftarDate = new Date(date);
+            iftarDate.setHours(17, iMin, 0);
+
+            return {
+                ramadan: i + 1,
+                date: date,
+                sahari: sahariDate,
+                iftar: iftarDate,
+                dateString: date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+                dayName: date.toLocaleDateString('en-GB', { weekday: 'short' })
+            };
+        });
+
+        // --- UI Functions ---
+        function switchView(viewName) {
+            ['dashboard', 'calendar', 'tips'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+                document.getElementById(`btn-${v}`).classList.remove('active', 'text-emerald-400');
+                document.getElementById(`btn-${v}`).classList.add('text-slate-400');
+            });
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            document.getElementById(`btn-${viewName}`).classList.add('active', 'text-emerald-400');
+            window.scrollTo(0, 0);
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        }
+
         function updateClock() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { hour12: false });
-            document.getElementById('live-clock').textContent = timeString;
+            document.getElementById('time-display').innerText = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            document.getElementById('date-display').innerText = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            updateCountdown(now);
         }
+
+        function updateCountdown(now) {
+            let todayData = schedule.find(d => 
+                d.date.getFullYear() === now.getFullYear() &&
+                d.date.getMonth() === now.getMonth() &&
+                d.date.getDate() === now.getDate()
+            ) || schedule[0];
+
+            document.getElementById('current-ramadan-day').innerText = todayData.ramadan;
+            document.getElementById('today-sahari').innerText = formatTime(todayData.sahari);
+            document.getElementById('today-iftar').innerText = formatTime(todayData.iftar);
+
+            const sTime = todayData.sahari.getTime();
+            const iTime = todayData.iftar.getTime();
+            const currentTime = now.getTime();
+
+            let target, label;
+
+            if (currentTime < sTime) {
+                target = sTime;
+                label = "Sahari Ends In";
+            } else if (currentTime < iTime) {
+                target = iTime;
+                label = "Iftar In";
+            } else {
+                // Next day's Sahari
+                const nextIndex = Math.min(todayData.ramadan, 29);
+                target = schedule[nextIndex].sahari.getTime();
+                label = "Next Sahari";
+            }
+
+            const diff = Math.max(0, target - currentTime);
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('next-label').innerText = label;
+            document.getElementById('countdown-display').innerText = 
+                `\( {h.toString().padStart(2, '0')}: \){m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function renderCalendar() {
+            const tbody = document.getElementById('calendar-body');
+            tbody.innerHTML = schedule.map(day => `
+                <tr class="hover:bg-slate-800/50 transition-colors">
+                    <td class="p-4 text-center font-bold text-emerald-400">${day.ramadan}</td>
+                    <td class="p-4">
+                        <div class="font-medium">${day.dateString}</div>
+                        <div class="text-xs text-slate-500">${day.dayName}</div>
+                    </td>
+                    <td class="p-4 text-center font-mono text-emerald-400">${formatTime(day.sahari)}</td>
+                    <td class="p-4 text-center font-mono text-orange-400">${formatTime(day.iftar)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Init
+        renderCalendar();
         setInterval(updateClock, 1000);
         updateClock();
+        switchView('dashboard'); // start on dashboard
     </script>
 </body>
 </html>
