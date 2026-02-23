@@ -1,312 +1,366 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Pro - Kachua</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;700&display=swap');
-        
-        :root {
-            --emerald-main: #059669;
-            --emerald-soft: #ecfdf5;
-        }
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  Home, 
+  Calendar, 
+  Compass, 
+  Clock, 
+  HandMetal, 
+  Search, 
+  MapPin, 
+  Sun, 
+  RefreshCcw, 
+  ChevronRight, 
+  X,
+  CheckCircle2,
+  Bell,
+  Trophy
+} from 'lucide-react';
 
-        body { 
-            font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', sans-serif; 
-            -webkit-tap-highlight-color: transparent;
-        }
+// --- CONSTANTS & DATA ---
+const COLORS = {
+  bg: '#0A0F1E',
+  card: '#161C30',
+  primary: '#00E5C0',
+  accent: '#FFD700',
+  text: '#FFFFFF',
+  textSecondary: '#94A3B8'
+};
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
+const PRAYER_DATA = [
+  { id: 'fajr', name: 'Fajr', nameBn: 'ফজর', time: '05:09 AM', icon: 'Sun' },
+  { id: 'dhuhr', name: 'Dhuhr', nameBn: 'যোহর', time: '12:11 PM', icon: 'Sun' },
+  { id: 'asr', name: 'Asr', nameBn: 'আসর', time: '03:28 PM', icon: 'Sun', current: true },
+  { id: 'maghrib', name: 'Maghrib', nameBn: 'মাগরিব', time: '05:57 PM', icon: 'Moon' },
+  { id: 'isha', name: 'Isha', nameBn: 'ইশা', time: '07:13 PM', icon: 'Moon' },
+];
 
-        .progress-ring { transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%; }
+const CALENDAR_DATA = [
+  { day: 1, date: '18 Feb', sahari: '05:12', iftar: '05:55' },
+  { day: 2, date: '19 Feb', sahari: '05:12', iftar: '05:55' },
+  { day: 3, date: '20 Feb', sahari: '05:11', iftar: '05:56' },
+  { day: 4, date: '21 Feb', sahari: '05:10', iftar: '05:56' },
+  { day: 5, date: '22 Feb', sahari: '05:10', iftar: '05:57' },
+  { day: 6, date: '23 Feb', sahari: '05:09', iftar: '05:57', active: true },
+  { day: 7, date: '24 Feb', sahari: '05:08', iftar: '05:58' },
+  { day: 8, date: '25 Feb', sahari: '05:07', iftar: '05:58' },
+  { day: 9, date: '26 Feb', sahari: '05:07', iftar: '05:59' },
+  { day: 10, date: '27 Feb', sahari: '05:06', iftar: '05:59' },
+];
 
-        .active-tab { color: var(--emerald-main) !important; font-weight: 700; }
-        .active-tab i { transform: translateY(-4px); transition: all 0.3s ease; }
-        
-        .today-highlight { border: 2px solid var(--emerald-main) !important; background: var(--emerald-soft); }
+const DHIKR_PRESETS = [
+  { en: 'SubhanAllah', ar: 'سُبْحَانَ اللهِ', bn: 'সুবহানাল্লাহ' },
+  { en: 'Alhamdulillah', ar: 'الْحَمْدُ لِلَّهِ', bn: 'আলহামদুলিল্লাহ' },
+  { en: 'Allahu Akbar', ar: 'اللهُ أَكْبَرُ', bn: 'আল্লাহু আকবার' },
+  { en: 'Astaghfirullah', ar: 'أَسْتَغْفِرُ اللهَ', bn: 'আস্তাগফিরুল্লাহ' },
+  { en: 'La ilaha illallah', ar: 'لَا إِلَهَ إِلَّا اللهُ', bn: 'লা ইলাহা ইল্লাল্লাহ' },
+];
 
-        /* Smooth View Transitions */
-        .view-section { transition: opacity 0.2s ease-in-out; }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-900 min-h-screen">
+// --- COMPONENTS ---
 
-    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col bg-white shadow-2xl relative">
-        
-        <header class="p-5 flex justify-between items-center sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-            <div>
-                <h1 class="text-xl font-extrabold text-emerald-600 tracking-tight">RAMADAN 2026</h1>
-                <div class="flex items-center gap-1.5 text-slate-500">
-                    <i class="fas fa-location-dot text-[10px] text-emerald-500"></i>
-                    <span class="text-[10px] font-bold uppercase tracking-widest">Kachua, Chandpur</span>
-                </div>
-            </div>
-            <button onclick="toggleLanguage()" id="lang-toggle" class="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-bold text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
-                বাংলা
-            </button>
-        </header>
+const App = () => {
+  const [activeTab, setActiveTab] = useState('home');
+  const [lang, setLang] = useState('en'); // 'en' or 'bn'
+  const [tasbihCount, setTasbihCount] = useState(0);
+  const [dhikrIndex, setDhikrIndex] = useState(0);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [location, setLocation] = useState('Chandpur');
+  const [timeLeft, setTimeLeft] = useState('04:24:25');
 
-        <main class="flex-grow p-4 pb-24">
-            
-            <div id="view-dashboard" class="view-section space-y-5">
-                <div class="bg-emerald-600 p-6 rounded-[2rem] text-white shadow-xl shadow-emerald-200/50 relative overflow-hidden">
-                    <div class="relative z-10">
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold backdrop-blur-md uppercase tracking-wider">
-                                <span data-en="Ramadan Day" data-bn="রমজান দিন">Ramadan Day</span> <span id="current-ramadan-day">1</span>
-                            </span>
-                            <span id="live-clock" class="text-xs font-mono font-medium opacity-80">00:00:00</span>
-                        </div>
-                        
-                        <p class="text-emerald-100 text-xs font-semibold uppercase tracking-widest mb-1" id="next-label">Next Milestone</p>
-                        <h2 class="text-5xl font-black tracking-tighter mb-6" id="countdown-display">00:00:00</h2>
-                        
-                        <div class="w-full bg-emerald-800/40 h-2 rounded-full overflow-hidden">
-                            <div id="fast-progress" class="bg-white h-full transition-all duration-1000" style="width: 0%"></div>
-                        </div>
-                    </div>
-                    <i class="fas fa-moon absolute -bottom-10 -right-10 text-white/10 text-[12rem] -rotate-12"></i>
-                </div>
+  // Simulated countdown effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        const [h, m, s] = prev.split(':').map(Number);
+        let totalSeconds = h * 3600 + m * 60 + s - 1;
+        if (totalSeconds < 0) return "00:00:00";
+        const nh = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+        const nm = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+        const ns = (totalSeconds % 60).toString().padStart(2, '0');
+        return `${nh}:${nm}:${ns}`;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
-                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
-                            <i class="fas fa-sun text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest" data-en="Sahari Ends" data-bn="সাহরি শেষ">Sahari Ends</p>
-                            <p class="text-lg font-bold text-slate-800" id="today-sahari">--:--</p>
-                        </div>
-                    </div>
-                    <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
-                        <div class="w-10 h-10 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center shrink-0">
-                            <i class="fas fa-moon text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest" data-en="Iftar Starts" data-bn="ইফতার শুরু">Iftar Starts</p>
-                            <p class="text-lg font-bold text-slate-800" id="today-iftar">--:--</p>
-                        </div>
-                    </div>
-                </div>
+  const t = (en, bn) => (lang === 'en' ? en : bn);
 
-                <div class="bg-slate-900 p-6 rounded-[2rem] text-white">
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-1.5 h-4 bg-emerald-500 rounded-full"></div>
-                        <h3 class="font-bold text-xs uppercase tracking-widest" data-en="Daily Intention" data-bn="প্রতিদিনের দোয়া">Daily Intention</h3>
-                    </div>
-                    <div id="dua-container" class="space-y-6">
-                        <div class="text-right">
-                            <p class="text-xs text-emerald-400 font-bold mb-2 uppercase tracking-widest" data-en="Sahari Dua" data-bn="রোজা রাখার দোয়া">Sahari Dua</p>
-                            <p class="text-2xl font-arabic leading-loose mb-2" dir="rtl">نَوَيْتُ اَنْ اَصُوْمَ غَدًا مِّنْ شَهْرِ رَمْضَانَ الْمُبَارَكِ فَرْضًا لَكَ يَا اللهُ</p>
-                            <p class="text-slate-400 text-[11px] italic" data-en="I intend to fast tomorrow for the month of Ramadan for the sake of Allah." data-bn="আমি আগামীকাল আল্লাহর সন্তুষ্টির জন্য রমজান মাসের রোজা রাখার নিয়ত করলাম।">I intend to fast tomorrow...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  const handleTasbihClick = () => {
+    setTasbihCount(prev => prev + 1);
+    // Vibrate if available
+    if (navigator.vibrate) navigator.vibrate(50);
+  };
 
-            <div id="view-calendar" class="view-section hidden space-y-4">
-                <div class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm">
-                    <table class="w-full text-sm">
-                        <thead class="bg-slate-50 border-b">
-                            <tr>
-                                <th class="p-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">Day</th>
-                                <th class="p-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">Date</th>
-                                <th class="p-4 text-center text-[9px] font-black text-slate-400 uppercase tracking-widest">Sahari</th>
-                                <th class="p-4 text-center text-[9px] font-black text-slate-400 uppercase tracking-widest">Iftar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="calendar-body" class="divide-y divide-slate-50">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
+  return (
+    <div className="flex flex-col h-screen max-w-md mx-auto bg-[#0A0F1E] text-white font-sans overflow-hidden select-none">
+      
+      {/* Top Status Bar (Mock) */}
+      <div className="flex justify-between items-center px-6 pt-4 pb-2">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => setShowLocationModal(true)}>
+          <div className="w-8 h-8 rounded-full bg-[#161C30] flex items-center justify-center text-[#00E5C0]">
+            <MapPin size={16} />
+          </div>
+          <div>
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Location</p>
+            <p className="text-sm font-semibold">{location}</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setLang(lang === 'en' ? 'bn' : 'en')}
+            className="w-8 h-8 rounded-full bg-[#161C30] flex items-center justify-center text-[#FFD700] text-[10px] font-bold border border-slate-700"
+          >
+            {lang.toUpperCase()}
+          </button>
+          <div className="w-8 h-8 rounded-full bg-[#161C30] flex items-center justify-center text-[#FFD700]">
+            <Sun size={16} />
+          </div>
+        </div>
+      </div>
 
-            <div id="view-tasbih" class="view-section hidden flex flex-col items-center justify-center py-10 space-y-8">
-                <div class="text-center">
-                    <h2 class="text-3xl font-black text-slate-800" id="tasbih-count">0</h2>
-                    <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-1">SubhanAllah</p>
-                </div>
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto px-6 py-4 pb-24 scrollbar-hide">
+        {activeTab === 'home' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <header>
+              <h1 className="text-2xl font-bold tracking-tight">{t('Ramadan Mubarak', 'রমজান মোবারক')}</h1>
+              <p className="text-[#00E5C0] font-medium">{t('Day 6 • 23 Feb', '৬ষ্ঠ দিন • ২৩ ফেব্রুয়ারি')}</p>
+            </header>
+
+            {/* Pulsing Iftar Countdown */}
+            <div className="relative overflow-hidden p-6 rounded-[32px] bg-gradient-to-br from-[#00E5C0] to-[#00A389] shadow-xl shadow-teal-900/20">
+              <div className="absolute top-0 right-0 p-4 opacity-20">
+                <Clock size={80} strokeWidth={1} />
+              </div>
+              <div className="relative z-10 flex flex-col items-center text-center">
+                <p className="text-[10px] font-bold tracking-[0.2em] text-white/80 uppercase">Time Until Iftar</p>
+                <h2 className="text-5xl font-black mt-2 mb-4 tracking-tight tabular-nums animate-pulse">
+                  {timeLeft}
+                </h2>
                 
-                <button onclick="incrementTasbih()" class="w-48 h-48 bg-white rounded-full border-8 border-emerald-50 shadow-2xl shadow-emerald-100 flex items-center justify-center active:scale-95 transition-transform group">
-                    <div class="w-40 h-40 bg-emerald-600 rounded-full flex items-center justify-center text-white text-4xl group-hover:bg-emerald-500 transition-colors">
-                        <i class="fas fa-fingerprint"></i>
-                    </div>
-                </button>
+                <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden mb-4">
+                  <div className="h-full bg-white rounded-full w-[65%]" />
+                </div>
 
-                <button onclick="resetTasbih()" class="text-slate-400 text-xs font-bold hover:text-red-500 transition-colors">
-                    <i class="fas fa-rotate-right mr-1"></i> RESET
-                </button>
+                <div className="flex justify-between w-full text-[11px] font-bold">
+                  <span className="opacity-80">Sahari: 05:09 AM</span>
+                  <span className="bg-white/20 px-2 py-1 rounded-lg">Iftar: 05:57 PM</span>
+                </div>
+              </div>
             </div>
 
-        </main>
+            {/* Gamified Streak Card */}
+            <div className="p-5 rounded-2xl bg-[#161C30] border border-slate-800 flex items-center gap-4">
+              <div className="relative flex items-center justify-center">
+                <svg className="w-14 h-14 transform -rotate-90">
+                  <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-800" />
+                  <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray={2 * Math.PI * 24} strokeDashoffset={2 * Math.PI * 24 * (1 - 0.2)} className="text-[#00E5C0]" />
+                </svg>
+                <span className="absolute text-sm font-black">6</span>
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-sm flex items-center gap-2">
+                  {t('Fasting Streak', 'রোজা রাখার ধারা')} <Trophy size={14} className="text-[#FFD700]" />
+                </p>
+                <p className="text-xs text-slate-400">{t("You've completed 20% of Ramadan!", "আপনি রমজানের ২০% পূর্ণ করেছেন!")}</p>
+              </div>
+              <ChevronRight size={18} className="text-slate-600" />
+            </div>
 
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/90 backdrop-blur-xl border-t border-slate-100 px-8 py-4 flex justify-between items-center z-[100]">
-            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center gap-1.5 text-slate-400 transition-all active-tab">
-                <i class="fas fa-house-chimney text-lg"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Home</span>
+            {/* Daily Dua Card */}
+            <div className="p-6 rounded-[28px] bg-[#161C30] border border-slate-800">
+              <div className="flex items-center gap-2 mb-4 text-[#FFD700]">
+                <Sun size={18} />
+                <span className="text-xs font-bold uppercase tracking-wider">{t('Suhoor Dua (Niyyah)', 'সাহরির দোয়া (নিয়াত)')}</span>
+              </div>
+              <p className="text-2xl leading-[1.8] text-[#00E5C0] font-serif text-right dir-rtl mb-4" style={{ fontFamily: 'Amiri, serif' }}>
+                نَوَيْتُ أَنْ أَصُومَ غَدًا مِنْ شَهْرِ رَمَضَانَ الْمُبَارَكِ فَرْضًا لَكَ يَا اللهُ فَتَقَبَّلْ مِنِّي إِنَّكَ أَنْتَ السَّمِيْعُ الْعَلِيْمُ
+              </p>
+              <p className="text-[13px] italic text-slate-400 mb-3 leading-relaxed">
+                Nawaitu an asuma ghadan min shahri Ramadanil mubaraki fardan laka ya Allahu, fataqabbal minni innaka antas-sami'ul-'alim.
+              </p>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                {t('I intend to fast tomorrow from the blessed month of Ramadan as an obligation to You, O Allah, so accept it from me. Indeed, You are the All-Hearing, the All-Knowing.', 'আমি আল্লাহর সন্তুষ্টির জন্য আগামীকালের রমজান মাসের রোজা রাখার নিয়ত করছি।')}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'calendar' && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-2xl font-bold mb-6">{t('Ramadan Calendar', 'রমজান ক্যালেন্ডার')}</h2>
+            <div className="rounded-2xl bg-[#161C30] overflow-hidden border border-slate-800">
+              <div className="grid grid-cols-4 bg-slate-800/50 p-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <span>Day</span>
+                <span>Date</span>
+                <span>Sahari</span>
+                <span>Iftar</span>
+              </div>
+              {CALENDAR_DATA.map((item) => (
+                <div key={item.day} className={`grid grid-cols-4 p-4 text-sm items-center border-t border-slate-800/50 ${item.active ? 'bg-[#00E5C0]/10' : ''}`}>
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold ${item.active ? 'bg-[#00E5C0] text-black' : 'bg-slate-800 text-slate-500'}`}>
+                    {item.day}
+                  </span>
+                  <span className="font-semibold text-slate-300">{item.date}</span>
+                  <span className="text-slate-400">{item.sahari}</span>
+                  <span className="font-bold text-white">{item.iftar}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'qibla' && (
+          <div className="flex flex-col items-center justify-center h-full animate-in fade-in zoom-in duration-500 text-center">
+             <h2 className="text-2xl font-bold mb-2">{t('Qibla Compass', 'কিবলা কম্পাস')}</h2>
+             <p className="text-slate-400 text-sm mb-12">{t('Rotate your device to align', 'সঠিক দিক পেতে আপনার ফোনটি ঘোরান')}</p>
+             
+             <div className="relative w-72 h-72">
+                {/* Compass Background */}
+                <div className="absolute inset-0 rounded-full border-4 border-slate-800 bg-[#161C30] flex items-center justify-center">
+                  <div className="absolute top-2 font-bold text-slate-500">N</div>
+                  <div className="absolute right-2 font-bold text-slate-500">E</div>
+                  <div className="absolute bottom-2 font-bold text-slate-500">S</div>
+                  <div className="absolute left-2 font-bold text-slate-500">W</div>
+                  
+                  {/* Outer Rings */}
+                  <div className="w-[85%] h-[85%] rounded-full border border-slate-700/50 border-dashed" />
+                  <div className="w-[70%] h-[70%] rounded-full border border-slate-700" />
+                </div>
+
+                {/* Animated Needle */}
+                <div className="absolute inset-0 flex items-center justify-center transition-transform duration-700 ease-out" style={{ transform: 'rotate(293deg)' }}>
+                  <div className="relative h-56 w-1 flex flex-col items-center">
+                    {/* The Qibla Arrow */}
+                    <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[30px] border-b-[#00E5C0] mb-[-1px]" />
+                    <div className="w-1 flex-1 bg-gradient-to-b from-[#00E5C0] to-transparent" />
+                    
+                    {/* Kaaba Icon */}
+                    <div className="absolute -top-10 flex flex-col items-center">
+                       <div className="bg-black w-8 h-8 rounded-sm border border-[#FFD700] flex items-center justify-center shadow-lg">
+                          <div className="w-6 h-[2px] bg-[#FFD700] absolute top-2" />
+                       </div>
+                       <span className="text-[10px] font-bold text-[#00E5C0] mt-1">293° KAABA</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Center Hub */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-4 h-4 bg-[#0A0F1E] rounded-full border-2 border-[#00E5C0]" />
+                </div>
+             </div>
+          </div>
+        )}
+
+        {activeTab === 'prayers' && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">{t('Prayer Times', 'নামাজের সময়')}</h2>
+                <Bell size={20} className="text-slate-500" />
+             </div>
+             
+             <div className="space-y-4">
+                {PRAYER_DATA.map((prayer) => (
+                  <div key={prayer.id} className={`p-5 rounded-2xl flex items-center justify-between border transition-all ${prayer.current ? 'bg-[#00E5C0]/5 border-[#00E5C0] shadow-lg shadow-teal-500/10' : 'bg-[#161C30] border-slate-800 opacity-60'}`}>
+                    <div className="flex items-center gap-4">
+                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${prayer.current ? 'bg-[#00E5C0] text-black' : 'bg-slate-800 text-slate-400'}`}>
+                          {prayer.icon === 'Sun' ? <Sun size={20} /> : <Compass size={20} />}
+                       </div>
+                       <div>
+                          <p className={`font-bold ${prayer.current ? 'text-white' : 'text-slate-300'}`}>{t(prayer.name, prayer.nameBn)}</p>
+                          {prayer.current && <p className="text-[10px] font-bold text-[#00E5C0] uppercase tracking-tighter">Current Prayer</p>}
+                       </div>
+                    </div>
+                    <p className={`text-lg font-bold ${prayer.current ? 'text-[#00E5C0]' : 'text-slate-400'}`}>{prayer.time}</p>
+                  </div>
+                ))}
+             </div>
+          </div>
+        )}
+
+        {activeTab === 'tasbih' && (
+          <div className="flex flex-col h-full animate-in fade-in duration-500">
+            <h2 className="text-2xl font-bold mb-2 text-center">{t('Tasbih Counter', 'তাসবিহ')}</h2>
+            
+            <div className="flex-1 flex flex-col items-center justify-center space-y-12">
+               {/* Dhikr Selector Button */}
+               <button 
+                onClick={() => setDhikrIndex((dhikrIndex + 1) % DHIKR_PRESETS.length)}
+                className="bg-[#161C30] border border-slate-800 px-6 py-3 rounded-2xl flex items-center gap-3 active:scale-95 transition-transform"
+               >
+                  <span className="font-semibold text-sm">{t(DHIKR_PRESETS[dhikrIndex].en, DHIKR_PRESETS[dhikrIndex].bn)}</span>
+                  <ChevronRight size={16} className="text-[#00E5C0] rotate-90" />
+               </button>
+
+               {/* Arabic Text */}
+               <div className="h-20 flex items-center justify-center">
+                  <h3 className="text-4xl text-[#00E5C0] font-serif transition-all" style={{ fontFamily: 'Amiri, serif' }}>
+                    {DHIKR_PRESETS[dhikrIndex].ar}
+                  </h3>
+               </div>
+
+               {/* Large Pulsing Counter Button */}
+               <div className="relative group" onClick={handleTasbihClick}>
+                  {/* Rings */}
+                  <div className="absolute inset-[-20px] rounded-full bg-[#00E5C0]/5 group-active:scale-110 transition-transform duration-75" />
+                  <div className="absolute inset-[-10px] rounded-full bg-[#00E5C0]/10 group-active:scale-105 transition-transform duration-75" />
+                  
+                  {/* Main Circle */}
+                  <button className="w-56 h-56 rounded-full bg-gradient-to-br from-[#00E5C0] to-[#00A389] shadow-2xl shadow-teal-500/20 flex flex-col items-center justify-center text-white active:scale-95 transition-transform duration-75 border-4 border-white/10">
+                    <span className="text-6xl font-black">{tasbihCount}</span>
+                    <span className="text-[10px] font-bold tracking-[0.3em] opacity-60 uppercase mt-2">Tap to count</span>
+                  </button>
+               </div>
+
+               {/* Reset Button */}
+               <button 
+                onClick={() => setTasbihCount(0)}
+                className="flex items-center gap-2 text-slate-500 font-bold text-xs uppercase tracking-widest hover:text-white transition-colors"
+               >
+                 <RefreshCcw size={14} />
+                 {t('Reset Counter', 'পুনরায় সেট করুন')}
+               </button>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0A0F1E]/80 backdrop-blur-xl border-t border-slate-800/50 px-4 pb-4 pt-2">
+        <div className="flex justify-between items-center">
+          <NavItem icon={<Home size={22} />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} color="#00E5C0" />
+          <NavItem icon={<Calendar size={22} />} label="Calendar" active={activeTab === 'calendar'} onClick={() => setActiveTab('calendar')} color="#00E5C0" />
+          <NavItem icon={<Compass size={22} />} label="Qibla" active={activeTab === 'qibla'} onClick={() => setActiveTab('qibla')} color="#00E5C0" />
+          <NavItem icon={<Clock size={22} />} label="Prayers" active={activeTab === 'prayers'} onClick={() => setActiveTab('prayers')} color="#00E5C0" />
+          <NavItem icon={<HandMetal size={22} />} label="Tasbih" active={activeTab === 'tasbih'} onClick={() => setActiveTab('tasbih')} color="#00E5C0" />
+        </div>
+      </nav>
+
+      {/* Location Modal */}
+      {showLocationModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-[#161C30] w-full max-w-md rounded-t-[32px] p-6 pb-12 animate-in slide-in-from-bottom-full duration-500 border-t border-slate-700">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold">{t('Change Location', 'অবস্থান পরিবর্তন')}</h3>
+              <button onClick={() => setShowLocationModal(false)} className="bg-slate-800 p-2 rounded-full text-slate-400">
+                <X size={20} />
+              </button>
+            </div>
+
+            <button className="w-full flex items-center justify-center gap-3 p-4 rounded-2xl bg-[#00E5C0]/10 border border-[#00E5C0]/30 text-[#00E5C0] font-bold mb-6 active:scale-95 transition-transform">
+              <MapPin size={20} />
+              {t('Use Current Location', 'বর্তমান অবস্থান ব্যবহার করুন')}
             </button>
-            <button onclick="switchView('calendar')" id="nav-calendar" class="nav-btn flex flex-col items-center gap-1.5 text-slate-400 transition-all">
-                <i class="fas fa-calendar-list text-lg"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Calendar</span>
-            </button>
-            <button onclick="switchView('tasbih')" id="nav-tasbih" class="nav-btn flex flex-col items-center gap-1.5 text-slate-400 transition-all">
-                <i class="fas fa-bead-reefs text-lg"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Tasbih</span>
-            </button>
-        </nav>
-    </div>
 
-    <script>
-        // Configuration
-        const RAMADAN_START_DATE = new Date(2026, 1, 19); // Feb 19, 2026
-        let currentLang = 'en';
-        let tasbihCount = 0;
+            <div className="relative mb-6">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+              <input 
+                type="text" 
+                placeholder={t('Enter city name...', 'শহরের নাম লিখুন...')}
+                className="w-full bg-[#0A0F1E] border border-slate-700 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-[#00E5C0] transition-colors"
+              />
+            </div>
 
-        // Generate Schedule (Kachua Specific Calculation)
-        const schedule = Array.from({ length: 30 }, (_, i) => {
-            const date = new Date(RAMADAN_START_DATE);
-            date.setDate(RAMADAN_START_DATE.getDate() + i);
-            
-            // Simulation of shifting times over the month
-            const sahari = new Date(date);
-            sahari.setHours(5, 11 - Math.floor(i/2), 0);
-            
-            const iftar = new Date(date);
-            iftar.setHours(17, 55 + Math.floor(i/2), 0);
-
-            return {
-                ramadan: i + 1,
-                date: date,
-                sahari: sahari,
-                iftar: iftar,
-                dateStr: date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-                dayName: date.toLocaleDateString('en-GB', { weekday: 'short' })
-            };
-        });
-
-        // Core Functions
-        function updateUI() {
-            const now = new Date();
-            
-            // Find current or next Ramadan day logic
-            let todayIdx = schedule.findIndex(d => 
-                d.date.toDateString() === now.toDateString()
-            );
-
-            // Handle edge case: if it's after Iftar, technically preparing for next day's Sahari
-            let effectiveDay = todayIdx !== -1 ? schedule[todayIdx] : schedule[0];
-            
-            document.getElementById('current-ramadan-day').innerText = effectiveDay.ramadan;
-            document.getElementById('today-sahari').innerText = formatTime(effectiveDay.sahari);
-            document.getElementById('today-iftar').innerText = formatTime(effectiveDay.iftar);
-            document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-
-            updateCountdown(now, effectiveDay, todayIdx);
-        }
-
-        function updateCountdown(now, today, idx) {
-            const sTime = today.sahari.getTime();
-            const iTime = today.iftar.getTime();
-            const currentTime = now.getTime();
-
-            let target, labelEn, labelBn, progress = 0;
-
-            if (currentTime < sTime) {
-                target = sTime;
-                labelEn = "Time until Sahari";
-                labelBn = "সাহরি পর্যন্ত সময়";
-                progress = 0;
-            } else if (currentTime < iTime) {
-                target = iTime;
-                labelEn = "Time until Iftar";
-                labelBn = "ইফতার পর্যন্ত সময়";
-                // Progress calculation
-                const totalFast = iTime - sTime;
-                const elapsed = currentTime - sTime;
-                progress = (elapsed / totalFast) * 100;
-            } else {
-                const nextDay = schedule[idx + 1] || schedule[0];
-                target = nextDay.sahari.getTime();
-                labelEn = "Next Sahari";
-                labelBn = "আগামী সাহরি";
-                progress = 0;
-            }
-
-            const diff = target - currentTime;
-            const h = Math.floor(diff / 3600000);
-            const m = Math.floor((diff % 3600000) / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
-
-            document.getElementById('next-label').innerText = currentLang === 'en' ? labelEn : labelBn;
-            document.getElementById('countdown-display').innerText = 
-                `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-            document.getElementById('fast-progress').style.width = `${progress}%`;
-        }
-
-        function switchView(view) {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-tab'));
-            document.getElementById(`nav-${view}`).classList.add('active-tab');
-            window.scrollTo(0,0);
-        }
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'bn' : 'en';
-            document.getElementById('lang-toggle').innerText = currentLang === 'en' ? 'বাংলা' : 'English';
-            
-            document.querySelectorAll('[data-en]').forEach(el => {
-                el.innerText = el.getAttribute(`data-${currentLang}`);
-            });
-            renderCalendar();
-        }
-
-        function formatTime(date) {
-            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-        }
-
-        function renderCalendar() {
-            const now = new Date().toDateString();
-            const tbody = document.getElementById('calendar-body');
-            tbody.innerHTML = schedule.map(day => `
-                <tr class="${day.date.toDateString() === now ? 'today-highlight' : ''} transition-colors">
-                    <td class="p-4 font-black text-slate-400">${day.ramadan}</td>
-                    <td class="p-4">
-                        <div class="font-bold text-slate-800">${day.dateStr}</div>
-                        <div class="text-[10px] text-slate-400 uppercase font-bold">${day.dayName}</div>
-                    </td>
-                    <td class="p-4 text-center text-emerald-600 font-bold">${formatTime(day.sahari).replace(' AM', '')}</td>
-                    <td class="p-4 text-center text-orange-600 font-bold">${formatTime(day.iftar).replace(' PM', '')}</td>
-                </tr>
-            `).join('');
-        }
-
-        // Tasbih Logic
-        function incrementTasbih() {
-            tasbihCount++;
-            document.getElementById('tasbih-count').innerText = tasbihCount;
-            if (window.navigator.vibrate) window.navigator.vibrate(50);
-        }
-
-        function resetTasbih() {
-            if(confirm('Reset counter?')) {
-                tasbihCount = 0;
-                document.getElementById('tasbih-count').innerText = "0";
-            }
-        }
-
-        // Initialize
-        renderCalendar();
-        setInterval(updateUI, 1000);
-        updateUI();
-    </script>
-</body>
-</html>
+            <div className="space-y-4">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">{t('Suggestions', 'পরামর্শসমূহ')}</p>
+              {['Dhaka, Banglad
